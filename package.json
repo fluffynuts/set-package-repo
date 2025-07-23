@@ -57,5 +57,10 @@
   },
   "bin": {
     "set-package-repo": "./dist/set-package-repo-cli.js"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fluffynuts/set-package-repo"
+  },
+  "homepage": "https://github.com/fluffynuts/set-package-repo"
 }

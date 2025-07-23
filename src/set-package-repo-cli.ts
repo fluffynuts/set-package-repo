@@ -15,14 +15,12 @@ function gatherOptions(): CliOptions {
 negate any boolean option by prepending --no-`)
         .option("force", {
             type: "boolean",
-            default: false,
             demandOption: false,
             description: "Force overwriting repository information"
         }).option("homepage", {
             type: "boolean",
             demandOption: false,
-            default: false,
-            description: "Also set the homepage field from the git repo url"
+            description: "Also set the homepage field from the git repo url (default)"
         }).argv as unknown as CliOptions;
     parsed.filePaths = [ ...parsed._ ];
     return parsed;
@@ -30,6 +28,7 @@ negate any boolean option by prepending --no-`)
 
 (async function main() {
     const options = gatherOptions();
+
     if (options.filePaths.length === 0) {
         console.error("Please provide one or more paths to package.json files to modify");
     }

@@ -45,9 +45,7 @@ describe(`set-package-repo`, () => {
         // Assert
         expect(result.success)
             .toBeTrue();
-        const
-            raw = await readTextFile(packageJsonPath),
-            parsed = JSON.parse(raw) as PackageIndex;
+        const parsed = await readPackageIndex(packageJsonPath);
 
         expect(parsed.repository)
             .toExist();
@@ -85,9 +83,7 @@ describe(`set-package-repo`, () => {
         // Assert
         expect(result.success)
             .toBeTrue();
-        const
-            raw = await readTextFile(packageJsonPath),
-            parsed = JSON.parse(raw) as PackageIndex;
+        const parsed = await readPackageIndex(packageJsonPath);
 
         expect(parsed.repository)
             .toExist();
@@ -120,6 +116,22 @@ describe(`set-package-repo`, () => {
                     "already set"
                 )
             );
+    });
+
+    it(`should set the homepage when the url is already set`, async () => {
+        // Arrange
+        const sandbox = await Sandbox.create();
+
+        await sandbox.exec("npm", [ "init", "-y" ]);
+        await sandbox.exec("git", [ "init" ]);
+        await sandbox.exec("git", [ "remote", "add", "origin", randomUrl() ]);
+
+        const
+            packageJsonPath = sandbox.fullPathFor("package.json"),
+            raw = await readTextFile(packageJsonPath);
+
+        // Act
+        // Assert
     });
 
     describe(`when not forced`, () => {
@@ -172,8 +184,7 @@ describe(`set-package-repo`, () => {
 
             const
                 packageJsonPath = sandbox.fullPathFor("package.json"),
-                raw = await readTextFile(packageJsonPath),
-                pkgIndex = JSON.parse(raw) as PackageIndex;
+                pkgIndex = await readPackageIndex(packageJsonPath);
 
             pkgIndex.homepage = randomUrl();
             await writeTextFile(packageJsonPath, JSON.stringify(pkgIndex, null, 2));
@@ -326,6 +337,11 @@ describe(`set-package-repo`, () => {
                 .toEqual(expected);
         });
     });
+
+    async function readPackageIndex(at: string): Promise<PackageIndex> {
+        const raw = await readTextFile(at);
+        return JSON.parse(raw) as PackageIndex;
+    }
 
     const seenUrls = new Set<string>();
 
