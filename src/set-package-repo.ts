@@ -39,11 +39,13 @@ export async function setPackageRepo(
         remote = await findOriginRemoteFor(packageJsonPath);
 
     if (remote === GitError.notInitialised) {
-        throw new Error(`${packageJsonPath} does not appear to be within an initialised git repository`);
+        return error(
+            `${packageJsonPath} does not appear to be within an initialised git repository`
+        );
     }
 
     if (remote === GitError.noRemotes) {
-        throw new Error(`no remotes have been set up for the repository containing '${packageJsonPath}'`);
+        return error(`no remotes have been set up for the repository containing '${packageJsonPath}'`);
     }
 
     const url = determineHttpsUrlFor(remote);

@@ -2,7 +2,7 @@
 import yargs from "yargs";
 import { type Options, setPackageRepo } from "./set-package-repo";
 import { fileExists } from "yafs";
-import { ctx } from "exec-step";
+import { ExecStepContext } from "exec-step";
 
 export interface CliOptions extends Options {
     _: string[];
@@ -33,14 +33,25 @@ negate any boolean option by prepending --no-`)
     if (options.filePaths.length === 0) {
         console.error("Please provide one or more paths to package.json files to modify");
     }
+    const ctx = new ExecStepContext({
+        throwErrors: false,
+        suppressErrorReporting: true
+    });
     for (const file of options.filePaths) {
+        let message: string | undefined = "";
         await ctx.exec(`update: ${file}`,
             async () => {
                 if (!await fileExists(file)) {
                     throw new Error(`file not found: ${file}`);
                 }
-                // await setPackageRepo(file, options);
+                const result = await setPackageRepo(file, options);
+                if (!result.success) {
+                    message = result.message;
+                }
             }
         );
+        if (message) {
+            console.warn(`  ${message}`);
+        }
     }
 })();
